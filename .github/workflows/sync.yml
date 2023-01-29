@@ -2,7 +2,7 @@ name: sync rss with notion databases
 
 on:
   schedule:
-    - cron: 5/* * * * * # JST 0:00
+    - cron: 5 * * * * # JST 0:00
   # 再実行やデバッグ用に手動でも実行可能にしておく
   workflow_dispatch:
 
