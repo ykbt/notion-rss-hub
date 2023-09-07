@@ -9,16 +9,21 @@ export class RssArticle {
   }
 
   async fetchArticles(feedSource: FeedSource): Promise<Article[]> {
-    const feed = await this.rssParser.parseURL(feedSource.Url);
-    if (!feed?.items?.length) return [];
+    try {
+      const feed = await this.rssParser.parseURL(feedSource.Url);
+      if (!feed?.items?.length) return [];
 
-    return feed.items.map((item) => {
-      return {
-        Title: item.title,
-        Url: item.link,
-        Published: item.isoDate,
-        FeedSource: feedSource,
-      };
-    });
+      return feed.items.map((item) => {
+        return {
+          Title: item.title,
+          Url: item.link,
+          Published: item.isoDate,
+          FeedSource: feedSource,
+        };
+      });
+    } catch (e) {
+      console.log(`${feedSource.Url} is error: ${e}`);
+      return [];
+    }
   }
 }
