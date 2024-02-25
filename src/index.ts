@@ -1,9 +1,10 @@
 import { FeedSource, Article } from './types';
 import { BookmarkBlock, Page, TitlePropertyValue, URLPropertyValue } from '@notionhq/client/build/src/api-types';
-import { InputPropertyValueMap } from '@notionhq/client/build/src/api-endpoints';
+import { InputPropertyValueMap, PageCoverInput } from '@notionhq/client/build/src/api-endpoints';
 import { config } from 'dotenv';
 import { RssArticle } from './RssArticle';
 import { Notionclient } from './NotionClient';
+import { getPageOGPMetadata } from 'metagros';
 
 config();
 
@@ -87,6 +88,7 @@ async function createArticlePage(article: Article) {
         },
       } as BookmarkBlock, // SDKの問題でidやcreated_timeもリクエストに含める必要がある https://github.com/makenotion/notion-sdk-js/issues/189
     ],
+    cover: await externalOgpImage(article),
   });
 }
 
@@ -95,7 +97,25 @@ async function updateArticlePage(pageId: string, article: Article) {
     page_id: pageId,
     archived: false,
     properties: articleProperties(article),
+    cover: await externalOgpImage(article),
   });
+}
+
+async function externalOgpImage(article: Article): Promise<PageCoverInput | null> {
+  if (article.Url) {
+    const metaProps = await getPageOGPMetadata(article.Url);
+
+    if (metaProps.image) {
+      return {
+        type: 'external',
+        external: {
+          url: metaProps.image,
+        },
+      };
+    }
+  }
+
+  return null;
 }
 
 function articleProperties(article: Article): InputPropertyValueMap {
