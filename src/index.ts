@@ -109,7 +109,7 @@ async function externalOgpImage(article: Article): Promise<PageCoverInput | null
       return {
         type: 'external',
         external: {
-          url: metaProps.image
+          url: metaProps.image,
         }
       } 
     }
